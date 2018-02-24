@@ -2,11 +2,11 @@ public class Circle extends GeometricObject {
     private double x = 0.0, y = 0.0, radius = 1.0;
 
     /** Constructor */
-    public Circle(){
+    public Circle() {
     }
 
     /** Constructor */
-    public  Circle(double x, double y, double radius){
+    public Circle(double x, double y, double radius) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -25,12 +25,12 @@ public class Circle extends GeometricObject {
     }
 
     /** Override method getArea in GeometricObject */
-    public double getArea(){
+    public double getArea() {
         return Math.PI * Math.pow(radius, 2);
     }
 
     /** Override method getPerimeter */
-    public double getPerimeter(){
+    public double getPerimeter() {
         return 2 * Math.PI * radius;
     }
 }
