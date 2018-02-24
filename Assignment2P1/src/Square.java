@@ -4,6 +4,7 @@ public class Square extends Rectangle {
     /** Constructor */
     public Square(double side) {
         super(side, side);
+        this.side = side;
     }
 
     /** Override method getArea in Rectangle */
