@@ -1,16 +1,20 @@
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 
     Stage window;
-    Scene scene1, scene2;
+    Scene scene1, scene2, scene3;
     Button myButton;
 
     public static void main(String[] args) {
@@ -58,11 +62,40 @@ public class Main extends Application {
 
         /** Scene 2 */
         Label label2 = new Label("Welcome to the second scene.");
-        Button button2 = new Button("Go to scene 1");
+
+        Button button2 = new Button("Go to border pane");
+        button2.setOnAction(e-> window.setScene(scene3));
+
         myButton.setOnAction(e -> window.setScene(scene1));
         VBox layout2 = new VBox(20);
-        layout2.getChildren().addAll(label2, myButton);
+        layout2.getChildren().addAll(label2, myButton, button2);
         scene2 = new Scene(layout2, 600, 400);
+
+        /** Embedded layouts */
+        HBox topMenu = new HBox(20);
+        topMenu.setAlignment(Pos.CENTER);
+        topMenu.setPadding(new Insets(20,0,20,0));
+        topMenu.setStyle("-fx-background-color: dodgerblue;");
+        Button buttonA = new Button("A");
+        Button buttonB = new Button("B");
+        Button buttonC = new Button("C");
+        topMenu.getChildren().addAll(buttonA,buttonB,buttonC);
+
+        VBox leftMenu = new VBox(20);
+        leftMenu.setStyle("-fx-background-color: dodgerblue;");
+        leftMenu.setPadding(new Insets(20,20,0,20));
+        Button buttonD = new Button("D");
+        Button buttonE = new Button("E");
+        Button buttonF = new Button("F");
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e-> window.setScene(scene2));
+        leftMenu.getChildren().addAll(buttonD,buttonE,buttonF, backButton);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(topMenu);
+        borderPane.setLeft(leftMenu);
+
+        scene3 = new Scene(borderPane, 600,400);
 
         /** Initialize window */
         window.setScene(scene1);
