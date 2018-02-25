@@ -19,11 +19,11 @@ public class Main extends Application {
 
     @Override //inherited method from Application class
     public void start(Stage primaryStage) throws Exception {
-        //stage
+        /** stage */
         window = primaryStage;
         window.setTitle("The Title of My Java FX Application");
 
-        //My Button
+        /** My Button */
         Image redButton = new Image(getClass().getResourceAsStream("X_BUTTON.png"));
         ImageView imageView = new ImageView(redButton);
         imageView.setFitHeight(20);
@@ -32,22 +32,31 @@ public class Main extends Application {
         myButton.setText("Big Red");
         myButton.setGraphic(imageView);
 
-        //Scene 1
+        /** Scene 1 */
         Label label1 = new Label("Welcome to the first scene.");
+            /** Buttons */
         Button sceneButton = new Button("Go to scene 2");
         Button popupButton = new Button("Open a new window");
         Button boolButton = new Button("Do you like Booleans?");
+        Button closeButton = new Button("Close");
+            /** Button actions */
+        window.setOnCloseRequest(e -> {
+            e.consume();
+            closeProgram();
+        });
         sceneButton.setOnAction(e -> window.setScene(scene2));
         popupButton.setOnAction(e -> new AlertBox().display("Popup", "Close me"));
-        boolButton.setOnAction(e->{
-            boolean answer = new ConfirmBox().display("Yes or No?","Are you sure?");
+        boolButton.setOnAction(e -> {
+            boolean answer = new ConfirmBox().display("Yes or No?", "Are you sure?");
             System.out.println("answer: " + answer);
         });
+        closeButton.setOnAction(e -> closeProgram());
+        /** Layout */
         VBox layout1 = new VBox(20);
-        layout1.getChildren().addAll(label1, sceneButton, popupButton, boolButton);
+        layout1.getChildren().addAll(label1, sceneButton, popupButton, boolButton, closeButton);
         scene1 = new Scene(layout1, 600, 400);
 
-        //Scene 2
+        /** Scene 2 */
         Label label2 = new Label("Welcome to the second scene.");
         Button button2 = new Button("Go to scene 1");
         myButton.setOnAction(e -> window.setScene(scene1));
@@ -55,8 +64,17 @@ public class Main extends Application {
         layout2.getChildren().addAll(label2, myButton);
         scene2 = new Scene(layout2, 600, 400);
 
-
+        /** Initialize window */
         window.setScene(scene1);
         window.show();
+    }
+
+    /** Close program method */
+    private void closeProgram(){
+        Boolean really = new ConfirmBox().display("Exit program", "Are you sure you want to exit?");
+        if (really) {
+            System.out.println("save to a file");
+            window.close();
+        }
     }
 }
