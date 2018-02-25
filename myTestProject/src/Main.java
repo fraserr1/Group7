@@ -7,13 +7,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class Main extends Application{
+public class Main extends Application {
 
     Stage window;
     Scene scene1, scene2;
     Button myButton;
 
-    public static void main(String[]args){
+    public static void main(String[] args) {
         launch(args); //setup main as a JavaFX app
     }
 
@@ -34,20 +34,26 @@ public class Main extends Application{
 
         //Scene 1
         Label label1 = new Label("Welcome to the first scene.");
-        Button button1 = new Button("Go to scene 2");
-        button1.setOnAction(e -> window.setScene(scene2));
+        Button sceneButton = new Button("Go to scene 2");
+        Button popupButton = new Button("Open a new window");
+        Button boolButton = new Button("Do you like Booleans?");
+        sceneButton.setOnAction(e -> window.setScene(scene2));
+        popupButton.setOnAction(e -> new AlertBox().display("Popup", "Close me"));
+        boolButton.setOnAction(e->{
+            boolean answer = new ConfirmBox().display("Yes or No?","Are you sure?");
+            System.out.println("answer: " + answer);
+        });
         VBox layout1 = new VBox(20);
-        layout1.getChildren().addAll(label1,button1);
-        scene1 = new Scene(layout1, 600,400);
+        layout1.getChildren().addAll(label1, sceneButton, popupButton, boolButton);
+        scene1 = new Scene(layout1, 600, 400);
 
         //Scene 2
         Label label2 = new Label("Welcome to the second scene.");
         Button button2 = new Button("Go to scene 1");
         myButton.setOnAction(e -> window.setScene(scene1));
         VBox layout2 = new VBox(20);
-        layout2.getChildren().addAll(label2,myButton);
-        scene2 = new Scene(layout2, 600,400);
-
+        layout2.getChildren().addAll(label2, myButton);
+        scene2 = new Scene(layout2, 600, 400);
 
 
         window.setScene(scene1);
