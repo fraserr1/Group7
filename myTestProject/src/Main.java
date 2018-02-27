@@ -4,9 +4,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -96,6 +98,33 @@ public class Main extends Application {
         borderPane.setLeft(leftMenu);
 
         scene3 = new Scene(borderPane, 600,400);
+
+        /** Gridpane */
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10,10,10,10));
+        grid.setVgap(8);
+        grid.setHgap(8);
+
+        Label nameLabel = new Label("username");
+        GridPane.setConstraints(nameLabel,0,0);
+
+        TextField nameInput = new TextField("username");
+        GridPane.setConstraints(nameInput,1,0);
+
+        Label passLabel = new Label("password");
+        GridPane.setConstraints(passLabel,0,1);
+
+        TextField passInput = new TextField();
+        passInput.setPromptText("password");
+        GridPane.setConstraints(passInput,1,1);
+
+        Button login = new Button("Log In");
+        GridPane.setConstraints(login, 1,2);
+
+        grid.getChildren().addAll(nameLabel,nameInput,passLabel,passInput,login);
+        grid.setAlignment(Pos.CENTER);
+        
+        borderPane.setCenter(grid);
 
         /** Initialize window */
         window.setScene(scene1);
