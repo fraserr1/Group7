@@ -45,6 +45,7 @@ public class Main extends Application {
         Button popupButton = new Button("Open a new window");
         Button boolButton = new Button("Do you like Booleans?");
         Button closeButton = new Button("Close");
+        Button inputButton = new Button("Input");
             /** Button actions */
         window.setOnCloseRequest(e -> {
             e.consume();
@@ -57,9 +58,10 @@ public class Main extends Application {
             System.out.println("answer: " + answer);
         });
         closeButton.setOnAction(e -> closeProgram());
+        inputButton.setOnAction(e-> new InputBox().display("Info Prompt", "Enter some text"));
         /** Layout */
         VBox layout1 = new VBox(20);
-        layout1.getChildren().addAll(label1, sceneButton, popupButton, boolButton, closeButton);
+        layout1.getChildren().addAll(label1, sceneButton, popupButton, boolButton, inputButton, closeButton);
         scene1 = new Scene(layout1, 600, 400);
 
         /** Scene 2 */
@@ -123,7 +125,7 @@ public class Main extends Application {
 
         grid.getChildren().addAll(nameLabel,nameInput,passLabel,passInput,login);
         grid.setAlignment(Pos.CENTER);
-        
+
         borderPane.setCenter(grid);
 
         /** Initialize window */
