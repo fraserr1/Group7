@@ -1,3 +1,4 @@
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -32,6 +33,7 @@ public class ConfirmBox {
         HBox layout = new HBox(10);
         layout.getChildren().addAll(label, yesButton, noButton);
         layout.setAlignment(Pos.CENTER);
+        layout.setPadding(new Insets(20,20,20,20));
 
         Scene scene = new Scene(layout);
         window.setScene(scene);
