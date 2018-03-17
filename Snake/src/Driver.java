@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.media.AudioClip;
 
 import java.util.Random;
 
@@ -149,6 +150,7 @@ public class Driver extends Application{
                 }
 
                 if (foodXPos == snakeXLength[0] && foodYPos == snakeYLength[0]){
+                    eatSound();
                     newFood();
                     score++;
                     lblScore.setText("Score: " + score);
@@ -236,16 +238,46 @@ public class Driver extends Application{
         this.snakeXLength = new int[50];
         this.snakeYLength = new int[50];
         this.score = 0;
-        this.snakeXLength[0]=64;
-        this.snakeYLength[0]=0;
+        this.snakeXLength[0]=320;
+        this.snakeYLength[0]=192;
         this.lblScore.setText("Score: " + score);
         this.newFood();
     }
 
     private void newFood(){
-        this.foodXPos = random.nextInt(XPOS -1)*32;
-        this.foodYPos = random.nextInt(YPOS -1)*32;
+        boolean overlap = true;
+        int x,y;
+
+        do
+        {
+            x = random.nextInt(XPOS -1)*32;
+            y = random.nextInt(YPOS -1)*32;
+
+            for(int i = 0; i < lengthOfSnake; i++)
+            {
+                if(snakeXLength[i] == x && snakeYLength[i] == y)
+                {
+                    break;
+                }
+
+                if( i == lengthOfSnake -1 && snakeXLength[i] != x && snakeYLength[i] != y)
+                {
+                    overlap = false;
+                }
+            }
+
+        }while (overlap);
+
+        this.foodXPos = x;
+        this.foodYPos = y;
     }
+
+    private void eatSound()
+    {
+        AudioClip u = new AudioClip(this.getClass().getResource("eat.mp3").toString());
+        u.play();
+    }
+
 
 //    private void getMove(Scene scene){
 //        scene.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
