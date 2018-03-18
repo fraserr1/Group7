@@ -1,3 +1,4 @@
+import com.sun.javafx.scene.traversal.Direction;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -9,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -32,24 +32,16 @@ public class Driver extends Application{
 
     private int score;
 
-    private Random random;
-
-    private int foodXPos;
-    private  int foodYPos;
-
-    private int[] snakeXLength;
-    private int[] snakeYLength;
+    private Snake s;
+    private Food f;
 
     private boolean left = false;
     private boolean right = false;
     private boolean up = false;
     private boolean down = false;
 
-    private int moves = 0;
 
     private Label lblScore = new Label("Score: " + score);
-
-    private int lengthOfSnake = 3;
 
     public static void main(String[]args){
         launch(args);
@@ -74,55 +66,48 @@ public class Driver extends Application{
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Image headLeft = new Image("headLeft.png");
-        Image headRight = new Image("headRight.png");
-        Image headUp = new Image("headUp.png");
-        Image headDown = new Image("headDown.png");
-        Image body = new Image("body.png");
-        Image food = new Image("food.png");
-
-        random = new Random();
-
+        s = new Snake(XPOS,YPOS);
+        f = new Food(XPOS,YPOS);
         newGame();
 
         scene = new Scene(parent);
 
-        scene.setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case LEFT:
-                    if (right != true)
-                        left = true;
-                    else
-                        right = true;
-                    up = false;
-                    down = false;
-                    break;
-                case RIGHT:
-                    if (left != true)
-                        right = true;
-                    else
-                        left = true;
-                    up = false;
-                    down = false;
-                    break;
-                case UP:
-                    left = false;
-                    right = false;
-                    if (down != true)
-                        up = true;
-                    else
-                        down = true;
-                    break;
-                case DOWN:
-                    left = false;
-                    right = false;
-                    if (up != true)
-                        down = true;
-                    else
-                        up = true;
-                    break;
-            }
-        });
+//        scene.setOnKeyPressed(e -> {
+//            switch (e.getCode()) {
+//                case LEFT:
+//                    if (right != true)
+//                        left = true;
+//                    else
+//                        right = true;
+//                    up = false;
+//                    down = false;
+//                    break;
+//                case RIGHT:
+//                    if (left != true)
+//                        right = true;
+//                    else
+//                        left = true;
+//                    up = false;
+//                    down = false;
+//                    break;
+//                case UP:
+//                    left = false;
+//                    right = false;
+//                    if (down != true)
+//                        up = true;
+//                    else
+//                        down = true;
+//                    break;
+//                case DOWN:
+//                    left = false;
+//                    right = false;
+//                    if (up != true)
+//                        down = true;
+//                    else
+//                        up = true;
+//                    break;
+//            }
+//        });
 
 
         primaryStage.setScene(scene);
@@ -131,90 +116,54 @@ public class Driver extends Application{
 
         Timeline gameLoop = new Timeline();
         gameLoop.setCycleCount(Timeline.INDEFINITE);
-        KeyFrame frame = new KeyFrame(Duration.seconds(0.3), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                //getMove(scene);
+        KeyFrame frame = new KeyFrame(Duration.seconds(0.3), e-> {
+//            @Override
+//            public void handle(ActionEvent event) {
+                /** ATTENTION: *****************************************************
+                 * This is where I get the keyboard input handled through a method called getMove
+                 * that takes the Scene as a parameter. The problem is that the keyboard input is
+                 * handled before the KeyFrame refreshes. This results in more than one move per KeyFrame
+                 * I have tried several things so far, including a Boolean to check if a move ha been made,
+                 * another implementation of the KeyHandler is commented out above (also functional, but the
+                 * same problem). Basically this allows the snake to fold back onto itself, if the player hits
+                 * three directions quickly eg. up-left-down.*/
+                getMove(scene); // Handle KeYEvents
                 gc.clearRect(0,0,W,H);
-                for (int i = 0; i < lengthOfSnake; i++){
+                for (int i = 0; i < s.getSnakeLength(); i++){
                     if (i == 0) {
-                        if (left) gc.drawImage(headLeft, snakeXLength[i], snakeYLength[i]);
-                        else if (right) gc.drawImage(headRight, snakeXLength[i], snakeYLength[i]);
-                        else if (up) gc.drawImage(headUp, snakeXLength[i], snakeYLength[i]);
-                        else gc.drawImage(headDown, snakeXLength[i], snakeYLength[i]);
+                        if (left) gc.drawImage(s.getHeadLeft(), s.getSnakeXLength()[i], s.getSnakeYLength()[i]);
+                        else if (right) gc.drawImage(s.getHeadRight(), s.getSnakeXLength()[i], s.getSnakeYLength()[i]);
+                        else if (up) gc.drawImage(s.getHeadUp(), s.getSnakeXLength()[i], s.getSnakeYLength()[i]);
+                        else gc.drawImage(s.getHeadDown(), s.getSnakeXLength()[i], s.getSnakeYLength()[i]);
                     }
                     else{
-                        gc.drawImage(body, snakeXLength[i],snakeYLength[i]);
+                        gc.drawImage(s.getBody(), s.getSnakeXLength()[i], s.getSnakeYLength()[i]);
                     }
                 }
 
-                if (foodXPos == snakeXLength[0] && foodYPos == snakeYLength[0]){
+                if (f.getFoodXPos() == s.getSnakeHeadXPos() && f.getFoodYPos() == s.getSnakeHeadYPos()){
                     newFood();
                     score++;
                     lblScore.setText("Score: " + score);
-                    lengthOfSnake++;
+                    s.setSnakeLength(s.getSnakeLength() + 1);
                 }
-                gc.drawImage(food,foodXPos,foodYPos);
+                gc.drawImage(f.getFood(),f.getFoodXPos(),f.getFoodYPos());
 
-                for (int k = 1; k < lengthOfSnake -1; k++){
-                    if (snakeXLength[k] == snakeXLength[0] && snakeYLength[k] == snakeYLength[0]) {
-                        newGame();
-                    }
+                // Move the snake according to the user's direction
+                if (up){
+                    if(s.updateSnakePos(Direction.UP)) newGame();
                 }
 
-                if (up) {
-                    for (int j = lengthOfSnake - 1; j >= 0; j--) {
-                        snakeXLength[j + 1] = snakeXLength[j];
-                    }
-                    for (int j = lengthOfSnake - 1; j >= 0; j--) {
-                        if (j == 0)
-                            if (snakeYLength[j] > 0)
-                                snakeYLength[j] -= 32;
-                            else newGame();
-                        else
-                            snakeYLength[j] = snakeYLength[j - 1];
-                    }
-                }
                 if (down){
-                    for (int j = lengthOfSnake - 1; j >= 0; j--) {
-                        snakeXLength[j + 1] = snakeXLength[j];
-                    }
-                    for (int j = lengthOfSnake - 1; j >= 0; j--) {
-                        if (j == 0)
-                            if (snakeYLength[j] + 32 < H)
-                                snakeYLength[j] += 32;
-                            else newGame();
-                        else
-                            snakeYLength[j] = snakeYLength[j - 1];
-                    }
-                }
-                if (right) {
-                    for (int j = lengthOfSnake - 1; j >= 0; j--) {
-                        snakeYLength[j + 1] = snakeYLength[j];
-                    }
-                    for (int j = lengthOfSnake - 1; j >= 0; j--) {
-                        if (j == 0)
-                            if (snakeXLength[j] + 32 < W)
-                                snakeXLength[j] += 32;
-                            else newGame();
-                        else
-                            snakeXLength[j] = snakeXLength[j - 1];
-                    }
+                    if(s.updateSnakePos(Direction.DOWN)) newGame();
                 }
                 if (left){
-                    for (int j = lengthOfSnake - 1; j >= 0; j--) {
-                        snakeYLength[j + 1] = snakeYLength[j];
-                    }
-                    for (int j = lengthOfSnake - 1; j >= 0; j--) {
-                        if (j == 0)
-                            if (snakeXLength[j] > 0)
-                                snakeXLength[j] -= 32;
-                            else newGame();
-                        else
-                            snakeXLength[j] = snakeXLength[j - 1];
-                    }
+                    if(s.updateSnakePos(Direction.LEFT)) newGame();
                 }
-            }
+                if (right){
+                    if(s.updateSnakePos(Direction.RIGHT)) newGame();
+                }
+            //}
         });
         gameLoop.getKeyFrames().add(frame);
         gameLoop.play();
@@ -227,65 +176,71 @@ public class Driver extends Application{
 
 
     private void newGame(){
-        this.moves = 0;
-        this.lengthOfSnake = 1;
-        this.left = false;
+        s.setSnakeLength(1);
+        s.newSnakePos();
         this.right = false;
         this.up = false;
         this.down = false;
-        this.snakeXLength = new int[50];
-        this.snakeYLength = new int[50];
         this.score = 0;
-        this.snakeXLength[0]=64;
-        this.snakeYLength[0]=0;
         this.lblScore.setText("Score: " + score);
-        this.newFood();
     }
-
+    /** newFood method
+     * Checks if the new food position is on top of the snake and moves it somewhere else*/
     private void newFood(){
-        this.foodXPos = random.nextInt(XPOS -1)*32;
-        this.foodYPos = random.nextInt(YPOS -1)*32;
+        boolean overlap;
+        do {
+        f.newFoodPos();
+        overlap = false;
+        for (int k = 0; k < s.getSnakeLength() - 1; k++) {
+            if (s.getSnakeXLength()[k] == f.getFoodXPos() && s.getSnakeYLength()[k] == f.getFoodYPos()) {
+                overlap = true;
+                break;
+            }
+        }}while(overlap);
+        f.newFoodPos();
     }
 
-//    private void getMove(Scene scene){
-//        scene.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
-//            @Override
-//            public void handle(javafx.scene.input.KeyEvent event) {
-//                switch (event.getCode()) {
-//                    case LEFT:
-//                        if (right != true)
-//                            left = true;
-//                        else
-//                            right = true;
-//                        up = false;
-//                        down = false;
-//                        break;
-//                    case RIGHT:
-//                        if (left != true)
-//                            right = true;
-//                        else
-//                            left = true;
-//                        up = false;
-//                        down = false;
-//                        break;
-//                    case UP:
-//                        left = false;
-//                        right = false;
-//                        if (down != true)
-//                            up = true;
-//                        else
-//                            down = true;
-//                        break;
-//                    case DOWN:
-//                        left = false;
-//                        right = false;
-//                        if (up != true)
-//                            down = true;
-//                        else
-//                            up = true;
-//                        break;
-//                }
-//            }
-//        });
-//    }
+    /** getMove method
+     * Handles KeyEvents*/
+    private void getMove(Scene scene){
+        scene.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
+            @Override
+            public void handle(javafx.scene.input.KeyEvent event) {
+                switch (event.getCode()) {
+                    case LEFT:
+                        if (right != true)
+                            left = true;
+                        else
+                            right = true;
+                        up = false;
+                        down = false;
+                        break;
+                    case RIGHT:
+                        if (left != true)
+                            right = true;
+                        else
+                            left = true;
+                        up = false;
+                        down = false;
+                        break;
+                    case UP:
+                        left = false;
+                        right = false;
+                        if (down != true)
+                            up = true;
+                        else
+                            down = true;
+                        break;
+                    case DOWN:
+                        left = false;
+                        right = false;
+                        if (up != true)
+                            down = true;
+                        else
+                            up = true;
+                        break;
+                }
+            }
+        });
+    }
 }
