@@ -178,6 +178,7 @@ public class Driver extends Application{
     private void newGame(){
         s.setSnakeLength(1);
         s.newSnakePos();
+        this.left = false;
         this.right = false;
         this.up = false;
         this.down = false;
@@ -197,7 +198,6 @@ public class Driver extends Application{
                 break;
             }
         }}while(overlap);
-        f.newFoodPos();
     }
 
     /** getMove method
