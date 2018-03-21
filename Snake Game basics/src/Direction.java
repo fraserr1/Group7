@@ -16,23 +16,23 @@ public class Direction {
 		this.direction = direction;
 	}
 
-	public static void moveInDirection(Directions direction, Snake snake, Node newSegment) {
+	public static void moveInDirection(Directions direction, Snake snake, Node tempSegment) {
 		switch (direction) {
 			case UP:
-				newSegment.setTranslateX(snake.getSnake().get(0).getTranslateX());
-				newSegment.setTranslateY(snake.getSnake().get(0).getTranslateY() - Main.BLOCK_SIZE);
+				tempSegment.setTranslateX(snake.getSnake().get(0).getTranslateX());
+				tempSegment.setTranslateY(snake.getSnake().get(0).getTranslateY() - Main.BLOCK_SIZE);
 				break;
 			case DOWN:
-				newSegment.setTranslateX(snake.getSnake().get(0).getTranslateX());
-				newSegment.setTranslateY(snake.getSnake().get(0).getTranslateY() + Main.BLOCK_SIZE);
+				tempSegment.setTranslateX(snake.getSnake().get(0).getTranslateX());
+				tempSegment.setTranslateY(snake.getSnake().get(0).getTranslateY() + Main.BLOCK_SIZE);
 				break;
 			case LEFT:
-				newSegment.setTranslateX(snake.getSnake().get(0).getTranslateX() - Main.BLOCK_SIZE);
-				newSegment.setTranslateY(snake.getSnake().get(0).getTranslateY());
+				tempSegment.setTranslateX(snake.getSnake().get(0).getTranslateX() - Main.BLOCK_SIZE);
+				tempSegment.setTranslateY(snake.getSnake().get(0).getTranslateY());
 				break;
 			case RIGHT:
-				newSegment.setTranslateX(snake.getSnake().get(0).getTranslateX() + Main.BLOCK_SIZE);
-				newSegment.setTranslateY(snake.getSnake().get(0).getTranslateY());
+				tempSegment.setTranslateX(snake.getSnake().get(0).getTranslateX() + Main.BLOCK_SIZE);
+				tempSegment.setTranslateY(snake.getSnake().get(0).getTranslateY());
 				break;
 			}
 	}

@@ -1,17 +1,37 @@
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
-public class Segment extends Rectangle {
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+public class Segment {
 	
-	public Rectangle segment;
-	public double prevCoordX;
-	public double prevCoordY;
-	public Direction direct;
+	public static Image headUp =  new Image(Main.class.getResource("SnakeHead_U.png").toString());
+	public static Image headDown =  new Image(Main.class.getResource("SnakeHead_D.png").toString());
+	public static Image headLeft =  new Image(Main.class.getResource("SnakeHead_L.png").toString());
+	public static Image headRight =  new Image(Main.class.getResource("SnakeHead_R.png").toString());
+	public static Image segment =  new Image(Main.class.getResource("segment+.png").toString());
+	public static ImageView segmentView = new ImageView(headRight);
 	
-	public Segment() {
-		this.segment = new Rectangle(Main.BLOCK_SIZE, Main.BLOCK_SIZE);
-		this.segment.setFill(Color.BLUE);
-		this.prevCoordX = segment.getTranslateX();
-		this.prevCoordY = segment.getTranslateY();
+	public static ImageView changeSegmentView(char dir) {
+		switch (dir) {
+		case 'U':
+			segmentView = new ImageView(headUp);
+			return segmentView;
+		case 'D':
+			segmentView = new ImageView(headDown);
+			return segmentView;
+		case 'L':
+			segmentView = new ImageView(headLeft);
+			return segmentView;
+		case 'R':
+			segmentView = new ImageView(headRight);
+			return segmentView;
+		case 'S':
+			segmentView = new ImageView(segment);
+			return segmentView;
+		case 'T':
+			return null;
+		default:
+			return null;
+		}	
 	}
 }
