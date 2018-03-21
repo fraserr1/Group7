@@ -52,6 +52,7 @@ public class Main extends Application {
 	//decision making variables for timeline
 	private boolean moved = false;
 	private boolean running = false;
+	private boolean isSoundOn = true;
 	
 	private Timeline timeline = new Timeline();
 	
@@ -115,7 +116,7 @@ public class Main extends Application {
     
     //text showing score and game level
         
-    	Text text = new Text("Player: X" + "   Level: " + gameLevel + "   Score: " + score);
+    	Text text = new Text("Level: " + gameLevel + "   Score: " + score);
     	text.setFont(Font.font("Calibri", FontWeight.BOLD, 30));
     	text.setFill(Color.WHITE);
     	text.setLayoutX(30);
@@ -128,6 +129,25 @@ public class Main extends Application {
     	text.setEffect(ds);
     	
     	// --- end of text
+    	// on click I want to turn off sound -----------------------------------------------------------------
+    	Image soundOn =  new Image(Main.class.getResource("sound_on.png").toString());
+    	Image soundOff =  new Image(Main.class.getResource("sound_off.png").toString());
+    	ImageView soundView = new ImageView(soundOn);
+    	soundView.setFitHeight(30);
+		soundView.setPreserveRatio(true);
+    	soundView.setLayoutX(760);
+    	soundView.setLayoutY(5);
+    	soundView.setOnMouseClicked(event -> {
+            if(isSoundOn == true) {
+            	isSoundOn = false;
+            	soundView.setImage(soundOff);
+            }else {
+            	isSoundOn = true;
+            	soundView.setImage(soundOn);
+            }
+        });
+    	//
+    	
     	
         Group snakeBody = new Group();
         
@@ -202,7 +222,9 @@ public class Main extends Application {
 				}
 			}
 			
-			text.setText("Player: X" + "   Level: " + gameLevel + "   Score: " + score);
+			text.setText("Level: " + gameLevel + "   Score: " + score);
+			
+			
 			
 			//******************** Collision Detection **********************//
 			
@@ -253,7 +275,7 @@ public class Main extends Application {
 		timeline.getKeyFrames().add(frame);
 		timeline.setCycleCount(Timeline.INDEFINITE);
 			
-		root.getChildren().addAll(background,text,food.foodView,snakeBody);
+		root.getChildren().addAll(background,text,soundView,food.foodView,snakeBody);
 		
 		return root;
 	}
@@ -280,7 +302,7 @@ public class Main extends Application {
 		
 		
 		game.setOnKeyPressed(event -> {
-			if (!moved)
+			if (!moved && pause == 0)
 				return;
 			
 			switch (event.getCode()) {
@@ -371,7 +393,7 @@ public class Main extends Application {
 	//*****************************************************//
 	//    functions that control start/end of the game     //
 	//*****************************************************//
-	private void startGame(Snake snake) {
+	public void startGame(Snake snake) {
 		direction.setDirection(Direction.Directions.RIGHT);
 		
 		ImageView segment = Segment.changeSegmentView(dir);
@@ -386,39 +408,37 @@ public class Main extends Application {
 		
 	}
 	
-	private void stopGame(Snake snake) {
+	public void stopGame(Snake snake) {
 		running = false;
 		snake.getSnake().clear();
 		timeline.stop();
 		primaryStage.setScene(intro);
-		primaryStage.show();
-		
+		primaryStage.show();	
 	}	
 	
-	private void pauseGame(Snake snake) {
-		//running = false;
+	public void pauseGame(Snake snake) {
+		running = false;
 		timeline.pause();
 	}
 	
-	private void resumeGame(Snake snake) {
+	public void resumeGame(Snake snake) {
 		running = true;
 		timeline.play();
-		//running = true;
 	}	
 	
-	private void restartGame(Snake snake) {
+	public void restartGame(Snake snake) {
 		stopGame(snake);
 		gameLevel = 1;
 		segmentsToAdd = 0;
 		score = 0;
 		dir = 'R';
 		running = true;
-		startGame(snake);
-		
+		startGame(snake);	
 	}
 	
 	public void playSound(char dir) {
-		switch (dir) {
+		if (isSoundOn) {
+			switch (dir) {
 			case 'U':
 				AudioClip u = new AudioClip(this.getClass().getResource("up.wav").toString());
 				u.play();
@@ -457,9 +477,11 @@ public class Main extends Application {
 				break;
 			default:
 				break;
-		}		
+			}		
+		}
 	}
 	
+	// i need to figure out why this doesn't work
 	public static double setTime(int gameLevel) {
 		double time;
 		switch (gameLevel) {
