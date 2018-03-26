@@ -1,3 +1,7 @@
+/** references: thenewboston
+ * https://www.youtube.com/watch?v=GbzKr46VvD0
+ * */
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,6 +16,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.sql.*;
 
 public class Main extends Application {
 
@@ -131,6 +137,8 @@ public class Main extends Application {
         /** Initialize window */
         window.setScene(scene1);
         window.show();
+
+
     }
 
     /** Close program method */

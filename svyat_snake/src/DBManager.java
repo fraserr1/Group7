@@ -1,14 +1,23 @@
+/** Reference
+ * https://www.tutorialspoint.com/sqlite/sqlite_java.htm*/
+
 import javafx.util.Pair;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
-public class DBTest {
+public class DBManager {
 
     /** db */
     public static void insertHighScore(String name, int score){
+        insertScore(name,score,delete());
+    }
+
+    private static void insertScore(String name, int score, int id){
         Connection c = null;
         Statement stmt = null;
-        int id = delete();
         try {
             Class.forName("org.sqlite.JDBC");
             c = DriverManager.getConnection("jdbc:sqlite:test.db");
@@ -54,20 +63,6 @@ public class DBTest {
             String sql = "DELETE from SCORES where ID=" + id + ";";
             stmt.executeUpdate(sql);
             c.commit();
-
-            rs = stmt.executeQuery( "SELECT * FROM SCORES ORDER BY SCORE DESC LIMIT 5;" );
-
-            while ( rs.next() ) {
-                id = rs.getInt("id");
-                String  name = rs.getString("name");
-                int age  = rs.getInt("score");
-
-                System.out.println( "ID = " + id );
-                System.out.println( "NAME = " + name );
-                System.out.println( "SCORE = " + age );
-                System.out.println();
-            }
-            rs.close();
             stmt.close();
             c.close();
         } catch ( Exception e ) {
@@ -167,9 +162,6 @@ public class DBTest {
             System.exit(0);
         }
         System.out.println("Operation done successfully");
-    }
 
-    public static void main(String[]args){
-        showDB();
     }
 }

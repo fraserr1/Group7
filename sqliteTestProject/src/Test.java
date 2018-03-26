@@ -10,11 +10,10 @@ public class Test extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        int[] scores = {10,20,30,40,50};
-        String[] names = {"AAA","BBB","CCC", "DDD", "EEE"};
+        int score = 2;
 
-        data = DBTest.getScores();
-
+        data = DBManager.getScores();
+        checkScore(score);
         new HighScoreBox().display(data.getKey(), data.getValue());
         primaryStage.show();
     }
@@ -26,7 +25,8 @@ public class Test extends Application {
                 high = true;
         if (high){
             String name = new InputBox().display("Enter Name", "Enter Initials");
-            DBTest.insertHighScore(name, score);
+            DBManager.insertHighScore(name, score);
+            data = DBManager.getScores();
         }
     }
 }

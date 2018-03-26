@@ -1,3 +1,12 @@
+/**
+ * references
+ * https://www.youtube.com/watch?v=_SqnzvJuKiA
+ * https://www.w3schools.com/colors/colors_hex.asp
+ * https://www.javatips.net/api/javafx.scene.layout.backgroundfill
+ *
+ * */
+
+
 import com.sun.javafx.scene.traversal.Direction;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -15,6 +24,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
 
 import java.util.Random;
 
@@ -22,6 +32,7 @@ import java.util.Random;
 public class Driver extends Application{
     Stage window;
     Scene scene;
+    Timeline gameLoop;
 
     final private int BLOCK_SIZE = 32;
     final private int XPOS = 20;
@@ -32,6 +43,8 @@ public class Driver extends Application{
 
     private int score;
 
+    private Pair<String[],int[]> data;
+
     private Snake s;
     private Food f;
 
@@ -41,7 +54,7 @@ public class Driver extends Application{
     private boolean down = false;
 
 
-    private Label lblScore = new Label("Score: " + score);
+    private Label lblScore = new Label("Score: " + score);;
 
     public static void main(String[]args){
         launch(args);
@@ -56,6 +69,7 @@ public class Driver extends Application{
         top.getChildren().addAll(lblScore);
         parent.setTop(top);
 
+        data = DBManager.getScores();
 
         Pane root = new Pane();
         Canvas canvas = new Canvas(W,H);
@@ -114,19 +128,9 @@ public class Driver extends Application{
         primaryStage.show();
 
 
-        Timeline gameLoop = new Timeline();
+        gameLoop = new Timeline();
         gameLoop.setCycleCount(Timeline.INDEFINITE);
         KeyFrame frame = new KeyFrame(Duration.seconds(0.3), e-> {
-//            @Override
-//            public void handle(ActionEvent event) {
-                /** ATTENTION: *****************************************************
-                 * This is where I get the keyboard input handled through a method called getMove
-                 * that takes the Scene as a parameter. The problem is that the keyboard input is
-                 * handled before the KeyFrame refreshes. This results in more than one move per KeyFrame
-                 * I have tried several things so far, including a Boolean to check if a move ha been made,
-                 * another implementation of the KeyHandler is commented out above (also functional, but the
-                 * same problem). Basically this allows the snake to fold back onto itself, if the player hits
-                 * three directions quickly eg. up-left-down.*/
                 getMove(scene); // Handle KeYEvents
                 gc.clearRect(0,0,W,H);
                 for (int i = 0; i < s.getSnakeLength(); i++){
@@ -151,19 +155,18 @@ public class Driver extends Application{
 
                 // Move the snake according to the user's direction
                 if (up){
-                    if(s.updateSnakePos(Direction.UP)) newGame();
+                    if(s.updateSnakePos(Direction.UP)) restart();
                 }
 
                 if (down){
-                    if(s.updateSnakePos(Direction.DOWN)) newGame();
+                    if(s.updateSnakePos(Direction.DOWN)) restart();
                 }
                 if (left){
-                    if(s.updateSnakePos(Direction.LEFT)) newGame();
+                    if(s.updateSnakePos(Direction.LEFT)) restart();
                 }
                 if (right){
-                    if(s.updateSnakePos(Direction.RIGHT)) newGame();
+                    if(s.updateSnakePos(Direction.RIGHT)) restart();
                 }
-            //}
         });
         gameLoop.getKeyFrames().add(frame);
         gameLoop.play();
@@ -173,8 +176,6 @@ public class Driver extends Application{
         window.setResizable(false);
 
     }
-
-
     private void newGame(){
         s.setSnakeLength(1);
         s.newSnakePos();
@@ -184,6 +185,20 @@ public class Driver extends Application{
         this.down = false;
         this.score = 0;
         this.lblScore.setText("Score: " + score);
+    }
+
+    private void restart(){
+        gameLoop.stop();
+        checkScore(score);
+        s.setSnakeLength(1);
+        s.newSnakePos();
+        this.left = false;
+        this.right = false;
+        this.up = false;
+        this.down = false;
+        this.score = 0;
+        this.lblScore.setText("Score: " + score);
+        gameLoop.play();
     }
     /** newFood method
      * Checks if the new food position is on top of the snake and moves it somewhere else*/
@@ -199,6 +214,19 @@ public class Driver extends Application{
             }
         }}while(overlap);
     }
+    private void checkScore(int score){
+        boolean high = false;
+        data = DBManager.getScores();
+        for(int i = 0; i< 5; i++)
+            if (score >= data.getValue()[i])
+                high = true;
+        if (high){
+            new InputBox().display("Enter Name", "Enter Initials", score);
+        }
+        else
+            new HighScoreBox().display(data.getKey(),data.getValue());
+    }
+
 
     /** getMove method
      * Handles KeyEvents*/

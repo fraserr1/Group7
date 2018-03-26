@@ -1,3 +1,6 @@
+/** References
+ * https://www.youtube.com/watch?v=cwJK_WpseKQ*/
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
@@ -6,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -34,6 +38,10 @@ public class InputBox {
                 }
             }
         });
+        inputField.setTextFormatter(new TextFormatter<Object>(e->{
+            e.setText(e.getText().toUpperCase());
+            return e;
+        }));
         Button okButton = new Button("Ok");
         okButton.setOnAction(e -> {
             if (isText(inputField, inputField.getText())){
