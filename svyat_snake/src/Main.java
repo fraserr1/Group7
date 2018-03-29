@@ -9,6 +9,8 @@ import javafx.scene.media.AudioClip;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -27,47 +29,48 @@ import javafx.util.Pair;
 
 public class Main extends Application {
 
-    //*********************************************//
-    //               CONSTANTS                     //
-    //*********************************************//
+    //board
     public static final int BLOCK_SIZE = 40;
     public static final int APP_W = 20 * BLOCK_SIZE;
     public static final int APP_H = 15 * BLOCK_SIZE;
-    final static Image BACKGROUND_IMAGE = new Image(Main.class.getResource("BG.png").toString());
 
+    //background image
+    public final static Image BACKGROUND_IMAGE = new Image(Main.class.getResource("BG.png").toString());
 
-    public static int gameLevel=1;
+    //game control variables
+    public static int gameLevel = 1;
     public static int segmentsToAdd = 0;
     public static int score = 0;
     public static int pause = 0;
+    public static boolean moved = false;
+    public static boolean running = false;
+    public static boolean isSoundOn = true;
+    public static boolean highScoreBoxClosed = false;
 
+    //segment position variables
     public static double X0;
     public static double Y0;
     public static double X1;
     public static double Y1;
-
     public Direction direction = new Direction();
     public static char dir = 'R';
 
+    //nodes
     public static Snake snake;
     public static Food food;
-    public static Node tempSegment; //holds ImageView node
+    public static Node tempSegment;
+    public static Text text;
 
-    //decision making variables for timeline
-    private boolean moved = false;
-    private boolean running = false;
-    private boolean isSoundOn = true;
-
+    //scene related
+    static Scene intro, game;
     private Timeline timeline = new Timeline();
 
-    Scene intro, game;
-
+    //db
     private Pair<String[],int[]> data;
-    private Text text;
 
 
     //*****************************************//
-    //         layout for intro scene          //
+    //            INTRO SCENE LAYOUT           //
     //*****************************************//
     private Parent layout_intro() {
         Pane root = new Pane();
@@ -108,7 +111,7 @@ public class Main extends Application {
 
 
     //***************************************//
-    //        layout for game scene          //
+    //            GAME SCENE LAYOUT          //
     //***************************************//
 
     private Parent layout_game() {
@@ -117,12 +120,10 @@ public class Main extends Application {
         root.setPrefSize(APP_W, APP_H+40);
 
         //background imageView
-
         final ImageView background = new ImageView(BACKGROUND_IMAGE);
         background.setLayoutY(40);
 
-        //text showing score and game level
-
+        // ************* text showing score and game level *********** //
         text = new Text("Level: " + gameLevel + "   Score: " + score);
         text.setFont(Font.font("Calibri", FontWeight.BOLD, 30));
         text.setFill(Color.WHITE);
@@ -134,9 +135,10 @@ public class Main extends Application {
         ds.setColor(Color.color(0.5f, 0.5f, 0.5f));
 
         text.setEffect(ds);
+        // --- end of text showing score and game level --- //
 
-        // --- end of text
-        // on click I want to turn off sound -----------------------------------------------------------------
+
+        // ************ MUTE *************** //
         Image soundOn =  new Image(Main.class.getResource("sound_on.png").toString());
         Image soundOff =  new Image(Main.class.getResource("sound_off.png").toString());
         ImageView soundView = new ImageView(soundOn);
@@ -153,7 +155,7 @@ public class Main extends Application {
                 soundView.setImage(soundOn);
             }
         });
-        //
+        //------------ end of MUTE ------------ //
 
 
         Group snakeBody = new Group();
@@ -162,9 +164,9 @@ public class Main extends Application {
 
         food = new Food();
 
-        //------------- KEYFRAME -------------------//
 
-        KeyFrame frame = new KeyFrame(Duration.seconds(setTime(gameLevel)), event -> {
+        // ******************** KEYFRAME *********************//
+        KeyFrame frame = new KeyFrame(Duration.seconds(0.3), event -> {
             if(!running)
                 return;
 
@@ -232,7 +234,7 @@ public class Main extends Application {
 
 
 
-            //******************** Collision Detection **********************//
+            // ******************** COLLISION DETECTION ********************** //
 
             // if the head of the snake collides with any of its segments then restart the game
             for (Node segment : snake.getSnake()) {
@@ -251,42 +253,41 @@ public class Main extends Application {
                 playSound('E');
                 stopGame(snake);
             }
+            // ---------------- End of COLLISION DETECTION ----------------- //
 
-            //***************** End of Collision Detection *******************//
 
+            // ************ snake eating food scenario ***************** //
             if (food.foodView.getTranslateX() == X0 && food.foodView.getTranslateY() == Y0) {
                 food.randomMove(snake);
                 score ++;
                 segmentsToAdd += gameLevel;
                 playSound('B');
-            }
-            if (score > 40) {
+            } // update game level (and amount of segments to add consequentially) based on score
+            if (score > 40 && gameLevel != 5) {
                 gameLevel = 5;
-            } if (score <= 40) {
+            } if (score <= 40 && gameLevel != 4) {
                 gameLevel = 4;
-            } if (score <= 30) {
+            } if (score <= 30 && gameLevel != 3) {
                 gameLevel = 3;
-            } if (score <= 20) {
+            } if (score <= 20 && gameLevel != 2) {
                 gameLevel = 2;
-            } if (score <= 10) {
+            } if (score <= 10 && gameLevel != 1) {
                 gameLevel = 1;
             }
 
 
-
-
         });
-        //-----------END of KEYFRAME -------------------//
+        // ----------- end of KEYFRAME ----------------- //
+
 
         timeline.getKeyFrames().add(frame);
         timeline.setCycleCount(Timeline.INDEFINITE);
+
 
         Pane p = new Pane();
         p.setBackground(new Background(new BackgroundFill(Color.DEEPSKYBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
         p.getChildren().addAll(background,text,soundView);
         root.getChildren().addAll(p,food.foodView,snakeBody);
-
-//        root.getChildren().addAll(background,text,soundView,food.foodView,snakeBody);
 
         return root;
     }
@@ -298,19 +299,16 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-
-
         game = new Scene(layout_game());
-        //game.setFill(Color.DEEPSKYBLUE);
 
-        Scene intro = new Scene(layout_intro());
+        intro = new Scene(layout_intro());
 
         intro.setOnMouseClicked(event -> {
             primaryStage.setScene(game);
             primaryStage.show();
             running = true;
+            timeline.play();
         });
-
 
         game.setOnKeyPressed(event -> {
             if (!moved && pause == 0)
@@ -318,7 +316,7 @@ public class Main extends Application {
 
             switch (event.getCode()) {
                 case UP:
-                    if (direction.getDirection() != Direction.Directions.DOWN ) {
+                    if (direction.getDirection() != Direction.Directions.DOWN && pause != 1) {
                         direction.setDirection(Direction.Directions.UP);
                         playSound('U');
                         dir = 'U';
@@ -329,7 +327,7 @@ public class Main extends Application {
                     }
                     break;
                 case DOWN:
-                    if (direction.getDirection() != Direction.Directions.UP ) {
+                    if (direction.getDirection() != Direction.Directions.UP && pause != 1) {
                         direction.setDirection(Direction.Directions.DOWN);
                         playSound('D');
                         dir = 'D';
@@ -340,7 +338,7 @@ public class Main extends Application {
                     }
                     break;
                 case LEFT:
-                    if (direction.getDirection() != Direction.Directions.RIGHT ) {
+                    if (direction.getDirection() != Direction.Directions.RIGHT && pause != 1) {
                         direction.setDirection(Direction.Directions.LEFT);
                         playSound('L');
                         dir = 'L';
@@ -351,7 +349,7 @@ public class Main extends Application {
                     }
                     break;
                 case RIGHT:
-                    if (direction.getDirection() != Direction.Directions.LEFT ) {
+                    if (direction.getDirection() != Direction.Directions.LEFT && pause != 1) {
                         direction.setDirection(Direction.Directions.RIGHT);
                         playSound('R');
                         dir = 'R';
@@ -363,14 +361,10 @@ public class Main extends Application {
                     break;
                 case SPACE:
                     if (pause == 0) {
-                        pause = 1;
                         pauseGame(snake);
-                        System.out.println("PAUSED");
                     }
                     else {
-                        pause = 0;
                         resumeGame(snake);
-                        System.out.println("UNPAUSED");
                     }
                     break;
                 default:
@@ -379,6 +373,9 @@ public class Main extends Application {
 
             moved = false;
         });
+
+
+
 
         primaryStage.setTitle("SNAKE GAME");
         primaryStage.setResizable(false);
@@ -390,7 +387,27 @@ public class Main extends Application {
 
         startGame(snake);
 
+        // ******* LISTENER TO CATCH CHANGES IN PRIMARYSTAGE PROPERTIES ********
+        primaryStage.focusedProperty().addListener(new ChangeListener<Boolean>()
+        {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+
+                if (highScoreBoxClosed == true) {
+                    running = false;
+                    //pause = 0;
+                    primaryStage.setScene(intro);
+                    primaryStage.show();
+                    System.out.println(highScoreBoxClosed);
+                }
+            }
+        });
+        // ---------- end of LISTENER ------------ //
+
     }
+
+
+
     //*********************************************//
     //  the main function that launches JavaFx     //
     //*********************************************//
@@ -405,6 +422,7 @@ public class Main extends Application {
     //*****************************************************//
     public void startGame(Snake snake) {
         direction.setDirection(Direction.Directions.RIGHT);
+        dir = 'R';
 
         ImageView segment = Segment.changeSegmentView(dir);
         segment.setTranslateX(0);
@@ -415,14 +433,13 @@ public class Main extends Application {
         segmentsToAdd = 0;
         score = 0;
         timeline.play();
-
     }
 
     public void stopGame(Snake snake) {
         running = false;
         snake.getSnake().clear();
         timeline.stop();
-        text.setText("Level: " + gameLevel + "   Score: " + score);
+        text.setText("                                           GAME OVER");
         checkScore(score);
         gameLevel = 1;
         segmentsToAdd = 0;
@@ -431,28 +448,30 @@ public class Main extends Application {
         running = true;
         startGame(snake);
         pauseGame(snake);
-        pause = 1;
-        text.setText("Level: " + gameLevel + "   Score: " + score);
-        X0 += 40; /** THE HEAD DISAPPEARS ON KEY PRESS IF THIS IS NOT HERE*/
+        pause = 0;
+        X0 += 40; //reset snake//
     }
 
-
     public void pauseGame(Snake snake) {
+        pause = 1;
         running = false;
         timeline.pause();
     }
 
     public void resumeGame(Snake snake) {
+        pause = 0;
         running = true;
         timeline.play();
 
     }
 
+    //@SuppressWarnings("static-access")
     private void checkScore(int score){
+
         boolean high = false;
         data = DBManager.getScores();
         for(int i = 0; i< 5; i++)
-            if (score >= data.getValue()[i])
+            if (score > data.getValue()[i])
                 high = true;
         if (high){
             new InputBox().display("Enter Name", "Enter Initials", score);
@@ -461,16 +480,8 @@ public class Main extends Application {
             new HighScoreBox().display(data.getKey(),data.getValue());
     }
 
-//    public void restartGame(Snake snake) {
-//        stopGame(snake);
-//        gameLevel = 1;
-//        segmentsToAdd = 0;
-//        score = 0;
-//        dir = 'R';
-//        running = true;
-//        startGame(snake);
-//    }
 
+    // **************** SOUND EFFECTS ****************** //
     public void playSound(char dir) {
         if (isSoundOn) {
             switch (dir) {
@@ -515,28 +526,6 @@ public class Main extends Application {
             }
         }
     }
+    // --------- end of SOUND EFECTS ---------- //
 
-    // i need to figure out why this doesn't work
-    public static double setTime(int gameLevel) {
-        double time;
-        switch (gameLevel) {
-            case 1:
-                time = 0.5f;
-                return time;
-            case 2:
-                time = 0.4f;
-                return time;
-            case 3:
-                time = 0.3f;
-                return time;
-            case 4:
-                time = 0.2f;
-                return time;
-            case 5:
-                time = 0.1f;
-                return time;
-            default:
-                return 0;
-        }
-    }
 }
