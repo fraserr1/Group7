@@ -19,7 +19,7 @@ public class HighScoreBox {
     public static void display(String[] names, int[] scores) {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("High Scores");
+        window.setTitle("HIGH SCORES");
         window.setMinWidth(250);
         window.setResizable(false);
 
@@ -86,9 +86,9 @@ public class HighScoreBox {
         grid.setAlignment(Pos.CENTER);
         Button btClose = new Button("Close");
         // Communicate status with the Main class
-        Main.highScoreBoxClosed = false;
+        Main.setIsHighScoreBoxClosed(false);
         btClose.setOnAction(e -> {
-            Main.highScoreBoxClosed = true; // Let the Main class know the window is closed
+            Main.setIsHighScoreBoxClosed(true); // Let the Main class know the window is closed
             window.close();
 
         });

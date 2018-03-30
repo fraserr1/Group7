@@ -92,12 +92,12 @@ public class InputBox {
      * returns true if the TextField contains only letters and exactly three initials
      * otherwise resets the TextField, shows an error message in a window and returns
      * false*/
-    private boolean isValidInput(TextField inputField, String text) {
+    private boolean isValidInput(TextField tfInput, String text) {
         if (text.matches("[a-zA-Z]+") && text.length() == 3) return true;
         else {
             new AlertBox().display("Error", "Please Enter Three Letters Only");
-            inputField.setText("AAA");
-            inputField.requestFocus();
+            tfInput.setText("AAA");
+            tfInput.requestFocus();
             return false;
         }
     }
