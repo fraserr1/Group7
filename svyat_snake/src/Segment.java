@@ -1,15 +1,18 @@
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
+/** Segment class
+ * Manages sprites*/
 public class Segment {
 
-    public static Image headUp =  new Image(Main.class.getResource("SnakeHead_U.png").toString());
-    public static Image headDown =  new Image(Main.class.getResource("SnakeHead_D.png").toString());
-    public static Image headLeft =  new Image(Main.class.getResource("SnakeHead_L.png").toString());
-    public static Image headRight =  new Image(Main.class.getResource("SnakeHead_R.png").toString());
-    public static Image segment =  new Image(Main.class.getResource("segment+.png").toString());
-    public static ImageView segmentView = new ImageView(headRight);
+    private static Image headUp =  new Image("SnakeHead_U.png");
+    private static Image headDown =  new Image("SnakeHead_D.png");
+    private static Image headLeft =  new Image("SnakeHead_L.png");
+    private static Image headRight =  new Image("SnakeHead_R.png");
+    private static Image segment =  new Image("segment+.png");
+    private static ImageView segmentView = new ImageView(headRight);
 
+    /** Public changeSegmentView method
+     * Returns the ImageView of the Snake's body for the Snake's direction given as a char */
     public static ImageView changeSegmentView(char dir) {
         switch (dir) {
             case 'U':
@@ -27,8 +30,6 @@ public class Segment {
             case 'S':
                 segmentView = new ImageView(segment);
                 return segmentView;
-            case 'T':
-                return null;
             default:
                 return null;
         }

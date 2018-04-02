@@ -11,16 +11,6 @@ public class Direction {
     }
     private Directions direction = Directions.RIGHT;
 
-    /** Getter */
-    public Directions getDirection() {
-        return direction;
-    }
-
-    /** Setter */
-    public void setDirection(Directions direction) {
-        this.direction = direction;
-    }
-
     /** moveInDirection method
      * Moves the given Node to the head of the snake */
     public static void moveInDirection(Directions direction, Snake snake, Node tempSegment) {
@@ -43,4 +33,15 @@ public class Direction {
                 break;
         }
     }
+
+    /** GETTER */
+    public Directions getDirection() {
+        return direction;
+    }
+
+    /** SETTER */
+    public void setDirection(Directions direction) {
+        this.direction = direction;
+    }
+
 }

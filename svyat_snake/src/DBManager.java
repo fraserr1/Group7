@@ -28,7 +28,7 @@ public class DBManager {
         Statement stmt = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
+            c = DriverManager.getConnection("jdbc:sqlite:scores.db");
             c.setAutoCommit(false);
             System.out.println("Opened database successfully");
 
@@ -49,6 +49,41 @@ public class DBManager {
         System.out.println("Records created successfully");
     }
 
+    /** public getScores
+     * returns arrays of the database's names and scores as a Pair */
+    public static Pair<String[], int[]> getScores() {
+
+        Connection c = null;
+        Statement stmt = null;
+        String[] names = new String[5];
+        int[] scores = new int[5];
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:scores.db");
+            c.setAutoCommit(false);
+            System.out.println("Opened database successfully");
+
+            stmt = c.createStatement();
+
+            // Read the first five entries ordered by score
+            ResultSet rs = stmt.executeQuery("SELECT * FROM SCORES ORDER BY SCORE DESC LIMIT 5;");
+            int i = 0;
+            while (rs.next()) {
+                names[i] = rs.getString("name");
+                scores[i] = rs.getInt("score");
+                i++;
+            }
+            rs.close();
+            stmt.close();
+            c.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+        System.out.println("Operation done successfully");
+        return new Pair<>(names, scores);
+    }
+
     /** private delete method
      * removes the last entry from the database and returns
      * its primary key */
@@ -58,7 +93,7 @@ public class DBManager {
         int id = 0;
         try {
             Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
+            c = DriverManager.getConnection("jdbc:sqlite:scores.db");
             c.setAutoCommit(false);
             System.out.println("Opened database successfully");
 
@@ -94,7 +129,7 @@ public class DBManager {
         Statement stmt = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
+            c = DriverManager.getConnection("jdbc:sqlite:scores.db");
             System.out.println("Opened database successfully");
 
             stmt = c.createStatement();
@@ -112,41 +147,6 @@ public class DBManager {
         System.out.println("Table created successfully");
     }
 
-    /** public getScores
-     * returns arrays of the database's names and scores as a Pair */
-    public static Pair<String[], int[]> getScores() {
-
-        Connection c = null;
-        Statement stmt = null;
-        String[] names = new String[5];
-        int[] scores = new int[5];
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            System.out.println("Opened database successfully");
-
-            stmt = c.createStatement();
-
-            // Read the first five entries ordered by score
-            ResultSet rs = stmt.executeQuery("SELECT * FROM SCORES ORDER BY SCORE DESC LIMIT 5;");
-            int i = 0;
-            while (rs.next()) {
-                names[i] = rs.getString("name");
-                scores[i] = rs.getInt("score");
-                i++;
-            }
-            rs.close();
-            stmt.close();
-            c.close();
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
-        }
-        System.out.println("Operation done successfully");
-        return new Pair<>(names, scores);
-    }
-
     /** private showDB
      * outputs the entries in the the database to the console*/
     private static void showDB() {
@@ -155,7 +155,7 @@ public class DBManager {
         Statement stmt = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
+            c = DriverManager.getConnection("jdbc:sqlite:scores.db");
             c.setAutoCommit(false);
             System.out.println("Opened database successfully");
 
@@ -182,6 +182,5 @@ public class DBManager {
             System.exit(0);
         }
         System.out.println("Operation done successfully");
-
     }
 }

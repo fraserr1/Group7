@@ -1,6 +1,5 @@
-//original idea by Almas Baimagambetov was completely redesigned by COIS2240.GROUP7
+//original idea by Almas Baimagambetov was completely redesigned by COIS 2240 GROUP 7
 //https://www.youtube.com/watch?v=nK6l1uVlunc
-
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -13,7 +12,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -39,245 +37,61 @@ public class Main extends Application {
     public static final int BLOCK_SIZE = 40;
     public static final int APP_W = 20 * BLOCK_SIZE;
     public static final int APP_H = 15 * BLOCK_SIZE;
-
     // Background image
     public final static Image BACKGROUND_IMAGE = new Image("BG.png");
-
     /** Variables */
     // Game control variables
-    private static int gameLevel = 1;
-    private static int segmentsToAdd = 0;
-    private static int score = 0;
-    private static int pause = 0;
-    private static boolean moved = false;
-    private static boolean running = false;
-    private static boolean isSoundOn = true;
+    private int gameLevel = 1;
+    private int segmentsToAdd = 0;
+    private int score = 0;
+    private int pause = 0;
+    private boolean isMoved = false;
+    private boolean isRunning = false;
+    private boolean isSoundOn = true;
     private static boolean isHighScoreBoxClosed = false;
-
     // Segment position variables
-    private static double X0;
-    private static double Y0;
-    private static double X1;
-    private static double Y1;
+    private double X0;
+    private double Y0;
+    private double X1;
+    private double Y1;
     private Direction direction = new Direction();
-    private static char dir = 'R';
-
+    private char dir = 'R';
     // Nodes
-    private static Snake snake;
-    private static Food food;
-    private static Node tempSegment;
-    private static Text text;
+    private Snake snake;
+    private Food food;
+    private Node tempSegment;
+    private Text text;
     private ImageView headView, neckView, segmentView;
-
     // Scene related
-    private static Scene intro, game;
+    private Scene intro, game;
     private Timeline timeline = new Timeline();
-
     // Database
     private Pair<String[],int[]> data;
 
-    /** Setter */
-    public static void setIsHighScoreBoxClosed(boolean isHighScoreBoxClosed) {
-        Main.isHighScoreBoxClosed = isHighScoreBoxClosed;
-    }
-
-    /******************************************
-    //            GAME SCENE LAYOUT          //
-    //****************************************/
-    /** Private layout_game
-     * returns the Pane of the game's layout and initializes the game animation */
-    private Pane layout_game() {
-        // root Pane
-        Pane root = new Pane();
-        root.setPrefSize(APP_W, APP_H);
-
-        // Background
-        final ImageView backgroundView = new ImageView(BACKGROUND_IMAGE);
-        backgroundView.setLayoutY(40);
-
-        // ************* text showing score and game level *********** //
-        text = new Text("Level: " + gameLevel + "   Score: " + score);
-        text.setFont(Font.font("Calibri", FontWeight.BOLD, 30));
-        text.setFill(Color.WHITE);
-        text.setLayoutX(30);
-        text.setLayoutY(30);
-
-        DropShadow ds = new DropShadow();
-        ds.setOffsetY(3.0f);
-        ds.setColor(Color.color(0.5f, 0.5f, 0.5f));
-
-        text.setEffect(ds);
-        // --- end of text showing score and game level --- //
-
-        // ************ MUTE *************** //
-        Image soundOn =  new Image("sound_on.png");
-        Image soundOff =  new Image("sound_off.png");
-        ImageView soundView = new ImageView(soundOn);
-        soundView.setFitHeight(30);
-        soundView.setPreserveRatio(true);
-        soundView.setLayoutX(760);
-        soundView.setLayoutY(5);
-        soundView.setOnMouseClicked(event -> {
-            if(isSoundOn == true) {
-                isSoundOn = false;
-                soundView.setImage(soundOff);
-            }else {
-                isSoundOn = true;
-                soundView.setImage(soundOn);
-            }
-        });
-        //------------ end of MUTE ------------ //
-
-        /** Initialize game sprites */
-        Group snakeBody = new Group();
-        snake = new Snake(snakeBody);
-        food = new Food(snake);
-
-
-        // ******************** KEYFRAME *********************//
-        KeyFrame frame = new KeyFrame(Duration.seconds(0.3), event -> {
-            if(!running)
-                return;
-
-            if (snake.getSnake().size() <= 1) {
-                tempSegment = snake.getSnake().get(0);
-            }
-
-            X1 = tempSegment.getTranslateX();
-            Y1 = tempSegment.getTranslateY();
-
-            // Position the tempSegment in front of the current head
-            Direction.moveInDirection(direction.getDirection(), snake, tempSegment);
-
-            X0 = tempSegment.getTranslateX();
-            Y0 = tempSegment.getTranslateY();
-
-            moved = true;
-
-            if (snake.getSnake().size() == 1) {
-                if (segmentsToAdd == 0) {
-                    playSound('M');
-                    snake.getSnake().get(0).setTranslateX(X0);
-                    snake.getSnake().get(0).setTranslateY(Y0);
-                } else {
-                    playSound('M');
-                    headView = Segment.changeSegmentView(dir);
-                    headView.setTranslateX(X0);
-                    headView.setTranslateY(Y0);
-                    snake.getSnake().add(0, headView);
-
-
-                    neckView = Segment.changeSegmentView('S');
-                    neckView.setTranslateX(X1);
-                    neckView.setTranslateY(Y1);
-                    snake.getSnake().set(1, neckView);
-                    segmentsToAdd --;
-                }
-            } else if (snake.getSnake().size() > 1) {
-                if (segmentsToAdd == 0) {
-                    playSound('M');
-                    headView = Segment.changeSegmentView(dir);
-                    headView.setTranslateX(X0);
-                    headView.setTranslateY(Y0);
-
-                    neckView = Segment.changeSegmentView('S');
-                    neckView.setTranslateX(X1);
-                    neckView.setTranslateY(Y1);
-                    snake.getSnake().add(0, headView);
-                    snake.getSnake().set(1, neckView);
-                    snake.getSnake().remove(snake.getSnake().size()-1);
-                } else {
-                    playSound('M');
-                    ImageView headView = Segment.changeSegmentView(dir);
-                    headView.setTranslateX(X0);
-                    headView.setTranslateY(Y0);
-                    neckView = Segment.changeSegmentView('S');
-                    neckView.setTranslateX(X1);
-                    neckView.setTranslateY(Y1);
-                    snake.getSnake().add(0, headView);
-                    snake.getSnake().set(1, neckView);
-                    segmentsToAdd --;
-                }
-            }
-
-            // Update the score
-            text.setText("Level: " + gameLevel + "   Score: " + score);
-
-            // ******************** COLLISION DETECTION ********************** //
-
-            // If the head of the snake collides with any of its segments then restart the game
-            for (Node segment : snake.getSnake()) {
-                if (segment != snake.getSnake().get(0) && X0 == segment.getTranslateX()
-                        && Y0 == segment.getTranslateY()) {
-                    playSound('C');
-                    playSound('E');
-                    stopGame(snake);
-                    break;
-                }
-            }
-
-            // If the head of the snake moves outside the board bounds then restart the game
-            if (X0 < 0 || X0 >= APP_W || Y0 < 40 || Y0 >= APP_H) {
-                playSound('C');
-                playSound('E');
-                stopGame(snake);
-            }
-            // ---------------- End of COLLISION DETECTION ----------------- //
-
-            // ************ snake eating food scenario ***************** //
-            if (food.getFoodView().getTranslateX() == X0 && food.getFoodView().getTranslateY() == Y0) {
-                food.randomMove(snake);
-                score ++;
-                segmentsToAdd += gameLevel;
-                playSound('B');
-            } // Update game level (and amount of segments to add consequentially) based on score
-            if (score > 40 && gameLevel != 5) {
-                gameLevel = 5;
-            } if (score <= 40 && gameLevel != 4) {
-                gameLevel = 4;
-            } if (score <= 30 && gameLevel != 3) {
-                gameLevel = 3;
-            } if (score <= 20 && gameLevel != 2) {
-                gameLevel = 2;
-            } if (score <= 10 && gameLevel != 1) {
-                gameLevel = 1;
-            }
-        });
-        // ----------- end of KEYFRAME ----------------- //
-
-        // Update the Timeline
-        timeline.getKeyFrames().add(frame);
-        timeline.setCycleCount(Timeline.INDEFINITE);
-
-        // Scores and message bar
-        Pane p = new Pane();
-        p.setBackground(new Background(new BackgroundFill(Color.DEEPSKYBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-        p.getChildren().addAll(backgroundView,text,soundView);
-
-        root.getChildren().addAll(p,food.getFoodView(),snakeBody);
-
-        return root;
+    /************************************************
+     //  the main function that launches JavaFx     //
+     //**********************************************/
+    public static void main(String[] args) {
+        launch(args);
     }
 
     /************************************************
-    //               the START method              //
-    //**********************************************/
+     //               the START method              //
+     //**********************************************/
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-        game = new Scene(layout_game());
-
+        game = new Scene(getSnakeGame());
         intro = new Scene(new StartScreen().getRoot());
-
+        // Enter game
         intro.setOnMouseClicked(event -> {
             primaryStage.setScene(game);
             primaryStage.show();
-            running = true;
+            isRunning = true;
             timeline.play();
         });
-
+        // Handle game events
         game.setOnKeyPressed(event -> {
-            if (!moved && pause == 0)
+            if (!isMoved && pause == 0)
                 return;
 
             switch (event.getCode()) {
@@ -337,9 +151,8 @@ public class Main extends Application {
                     break;
             }
 
-            moved = false;
+            isMoved = false;
         });
-
         // Initialize primaryStage
         primaryStage.setTitle("SNAKE GAME");
         primaryStage.setResizable(false);
@@ -358,29 +171,191 @@ public class Main extends Application {
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
 
                 if (isHighScoreBoxClosed == true) {
-                    running = false;
+                    isRunning = false;
                     //pause = 0;
                     primaryStage.setScene(intro);
                     primaryStage.show();
                     //Clear GameOver message from the top bar
                     text.setText("Level: " + gameLevel + "   Score: " + score);
+                    food.randomMove(snake);
                 }
             }
         });
         // ---------- end of LISTENER ------------ //
-
     }
     // ---------- end of Start ------------ //
 
+    /******************************************
+    //            GAME SCENE LAYOUT          //
+    //****************************************/
+    /** Private getSnakeGame
+     * returns the Pane of the game's layout and initializes the game animation */
+    private Pane getSnakeGame() {
+        // root Pane
+        Pane root = new Pane();
+        root.setPrefSize(APP_W, APP_H);
+        // Background
+        final ImageView backgroundView = new ImageView(BACKGROUND_IMAGE);
+        backgroundView.setLayoutY(40);
 
-    /************************************************
-    //  the main function that launches JavaFx     //
-    //**********************************************/
-    public static void main(String[] args) {
-        launch(args);
+        // ************* text showing score and game level *********** //
+        text = new Text("Level: " + gameLevel + "   Score: " + score);
+        text.setFont(Font.font("Calibri", FontWeight.BOLD, 30));
+        text.setFill(Color.WHITE);
+        text.setLayoutX(30);
+        text.setLayoutY(30);
+
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(3.0f);
+        ds.setColor(Color.color(0.5f, 0.5f, 0.5f));
+
+        text.setEffect(ds);
+        // --- end of text showing score and game level --- //
+
+        // ************ MUTE *************** //
+        Image soundOn =  new Image("sound_on.png");
+        Image soundOff =  new Image("sound_off.png");
+        ImageView soundView = new ImageView(soundOn);
+        soundView.setFitHeight(30);
+        soundView.setPreserveRatio(true);
+        soundView.setLayoutX(760);
+        soundView.setLayoutY(5);
+        soundView.setOnMouseClicked(event -> {
+            if(isSoundOn == true) {
+                isSoundOn = false;
+                soundView.setImage(soundOff);
+            }else {
+                isSoundOn = true;
+                soundView.setImage(soundOn);
+            }
+        });
+        //------------ end of MUTE ------------ //
+
+        /** Initialize game sprites */
+        Group snakeBody = new Group();
+        snake = new Snake(snakeBody);
+        food = new Food(snake);
+
+
+        // ******************** KEYFRAME *********************//
+        KeyFrame frame = new KeyFrame(Duration.seconds(0.3), event -> {
+            if(!isRunning)
+                return;
+
+            if (snake.getSnake().size() <= 1) {
+                tempSegment = snake.getSnake().get(0);
+            }
+
+            X1 = tempSegment.getTranslateX();
+            Y1 = tempSegment.getTranslateY();
+            // Position the tempSegment in front of the current head
+            Direction.moveInDirection(direction.getDirection(), snake, tempSegment);
+
+            X0 = tempSegment.getTranslateX();
+            Y0 = tempSegment.getTranslateY();
+
+            isMoved = true;
+
+            if (snake.getSnake().size() == 1) {
+                if (segmentsToAdd == 0) {
+                    playSound('M');
+                    snake.getSnake().get(0).setTranslateX(X0);
+                    snake.getSnake().get(0).setTranslateY(Y0);
+                } else {
+                    playSound('M');
+                    headView = Segment.changeSegmentView(dir);
+                    headView.setTranslateX(X0);
+                    headView.setTranslateY(Y0);
+                    snake.getSnake().add(0, headView);
+
+                    neckView = Segment.changeSegmentView('S');
+                    neckView.setTranslateX(X1);
+                    neckView.setTranslateY(Y1);
+                    snake.getSnake().set(1, neckView);
+                    segmentsToAdd --;
+                }
+            } else if (snake.getSnake().size() > 1) {
+                if (segmentsToAdd == 0) {
+                    playSound('M');
+                    headView = Segment.changeSegmentView(dir);
+                    headView.setTranslateX(X0);
+                    headView.setTranslateY(Y0);
+
+                    neckView = Segment.changeSegmentView('S');
+                    neckView.setTranslateX(X1);
+                    neckView.setTranslateY(Y1);
+                    snake.getSnake().add(0, headView);
+                    snake.getSnake().set(1, neckView);
+                    snake.getSnake().remove(snake.getSnake().size()-1);
+                } else {
+                    playSound('M');
+                    ImageView headView = Segment.changeSegmentView(dir);
+                    headView.setTranslateX(X0);
+                    headView.setTranslateY(Y0);
+                    neckView = Segment.changeSegmentView('S');
+                    neckView.setTranslateX(X1);
+                    neckView.setTranslateY(Y1);
+                    snake.getSnake().add(0, headView);
+                    snake.getSnake().set(1, neckView);
+                    segmentsToAdd --;
+                }
+            }
+            // Update the score
+            text.setText("Level: " + gameLevel + "   Score: " + score);
+
+            // ******************** COLLISION DETECTION ********************** //
+            // If the head of the snake collides with any of its segments then restart the game
+            for (Node segment : snake.getSnake()) {
+                if (segment != snake.getSnake().get(0) && X0 == segment.getTranslateX()
+                        && Y0 == segment.getTranslateY()) {
+                    playSound('C');
+                    playSound('E');
+                    stopGame(snake);
+                    break;
+                }
+            }
+            // If the head of the snake moves outside the board bounds then restart the game
+            if (X0 < 0 || X0 >= APP_W || Y0 < 40 || Y0 >= APP_H) {
+                playSound('C');
+                playSound('E');
+                stopGame(snake);
+            }
+            // ---------------- End of COLLISION DETECTION ----------------- //
+
+            // ************ snake eating food scenario ***************** //
+            if (food.getFoodView().getTranslateX() == X0 && food.getFoodView().getTranslateY() == Y0) {
+                food.randomMove(snake);
+                score ++;
+                segmentsToAdd += gameLevel;
+                playSound('B');
+            }
+            // Update game level (and amount of segments to add consequentially) based on score
+            if (score > 40 && gameLevel != 5) {
+                gameLevel = 5;
+            } if (score <= 40 && gameLevel != 4) {
+                gameLevel = 4;
+            } if (score <= 30 && gameLevel != 3) {
+                gameLevel = 3;
+            } if (score <= 20 && gameLevel != 2) {
+                gameLevel = 2;
+            } if (score <= 10 && gameLevel != 1) {
+                gameLevel = 1;
+            }
+        });
+        // ----------- end of KEYFRAME ----------------- //
+
+        // Update the Timeline
+        timeline.getKeyFrames().add(frame);
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        // Scores and message bar
+        Pane p = new Pane();
+        p.setBackground(new Background(new BackgroundFill(Color.DEEPSKYBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        p.getChildren().addAll(backgroundView,text,soundView);
+
+        root.getChildren().addAll(p,food.getFoodView(),snakeBody);
+
+        return root;
     }
-
-
 
     /********************************************************
     //    functions that control start/end of the game     //
@@ -403,18 +378,14 @@ public class Main extends Application {
     /** Private stopGame method
      * Stops the game and checks the score by calling private checkScore */
     private void stopGame(Snake snake) {
-        running = false;
+        isRunning = false;
         snake.getSnake().clear();
         timeline.stop();
         text.setText("                                           GAME OVER");
         checkScore(score);
-        gameLevel = 1;
-        segmentsToAdd = 0;
-        score = 0;
-        dir = 'R';
-        running = true;
         startGame(snake);
-        pauseGame(snake);
+        isRunning = false;
+        timeline.pause();
         pause = 0;
         X0 += 40; //reset snake pos//
     }
@@ -423,7 +394,8 @@ public class Main extends Application {
      * Pauses the current game */
     private void pauseGame(Snake snake) {
         pause = 1;
-        running = false;
+        isRunning = false;
+        text.setText("                                             PAUSE");
         timeline.pause();
     }
 
@@ -431,7 +403,8 @@ public class Main extends Application {
      * Resumes a paused game */
     private void resumeGame(Snake snake) {
         pause = 0;
-        running = true;
+        isRunning = true;
+        text.setText("Level: " + gameLevel + "   Score: " + score);
         timeline.play();
 
     }
@@ -440,18 +413,17 @@ public class Main extends Application {
      * Checks a given score against the scores database using DBManager's getScores method
      * and gets the player's name if it is a high score using an InputBox */
     private void checkScore(int score){
-        boolean high = false;
+        boolean isHighScore = false;
         data = DBManager.getScores();
         for(int i = 0; i< 5; i++)
             if (score > data.getValue()[i])
-                high = true;
-        if (high){
+                isHighScore = true;
+        if (isHighScore){
             new InputBox().display("Enter Name", "Enter Initials", score);
         }
         else
             new HighScoreBox().display(data.getKey(),data.getValue());
     }
-
 
     // **************** SOUND EFFECTS ****************** //
     /** Private playSound method
@@ -502,4 +474,8 @@ public class Main extends Application {
     }
     // --------- end of SOUND EFFECTS ---------- //
 
+    /** Setter */
+    public static void setIsHighScoreBoxClosed(boolean isHighScoreBoxClosed) {
+        Main.isHighScoreBoxClosed = isHighScoreBoxClosed;
+    }
 }

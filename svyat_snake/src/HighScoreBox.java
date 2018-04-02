@@ -92,6 +92,11 @@ public class HighScoreBox {
             window.close();
 
         });
+        window.setOnCloseRequest(e -> {
+            e.consume();
+            Main.setIsHighScoreBoxClosed(true); // Let the Main class know the window is closed
+            window.close();
+        });
 
         // Combine the GridPane and a Close button in a VBox layout
         VBox layout = new VBox(35);
