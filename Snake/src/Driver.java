@@ -11,6 +11,8 @@ import com.sun.javafx.scene.traversal.Direction;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -19,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -33,6 +36,8 @@ public class Driver extends Application{
     Stage window;
     Scene scene;
     Timeline gameLoop;
+    long time;
+    boolean waiter = false;
 
     final private int BLOCK_SIZE = 32;
     final private int XPOS = 20;
@@ -131,7 +136,8 @@ public class Driver extends Application{
         gameLoop = new Timeline();
         gameLoop.setCycleCount(Timeline.INDEFINITE);
         KeyFrame frame = new KeyFrame(Duration.seconds(0.3), e-> {
-                getMove(scene); // Handle KeYEvents
+                time = System.currentTimeMillis();
+                getMove(scene, System.currentTimeMillis()); // Handle KeYEvents
                 gc.clearRect(0,0,W,H);
                 for (int i = 0; i < s.getSnakeLength(); i++){
                     if (i == 0) {
@@ -227,13 +233,28 @@ public class Driver extends Application{
             new HighScoreBox().display(data.getKey(),data.getValue());
     }
 
+    private void waitForIt(){
+        Timeline timer = new Timeline(new KeyFrame(Duration.seconds(0.3)));
+        timer.play();
+    }
 
     /** getMove method
      * Handles KeyEvents*/
-    private void getMove(Scene scene){
+    private void getMove(Scene scene, long time){
+
+        scene.onKeyPressedProperty().addListener(new ChangeListener<EventHandler<? super KeyEvent>>() {
+            @Override
+            public void changed(ObservableValue<? extends EventHandler<? super KeyEvent>> observable, EventHandler<? super KeyEvent> oldValue, EventHandler<? super KeyEvent> newValue) {
+                long newTime = System.currentTimeMillis();
+                if (newTime - time < 10) waiter = false;
+                else waiter = true;
+            }
+        });
+        if (!waiter){
         scene.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
             @Override
             public void handle(javafx.scene.input.KeyEvent event) {
+                waiter = true;
                 switch (event.getCode()) {
                     case LEFT:
                         if (right != true)
@@ -269,6 +290,6 @@ public class Driver extends Application{
                         break;
                 }
             }
-        });
+        });}
     }
 }
