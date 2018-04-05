@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="svyat_snake:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/svyat_snake_jar</output-path>
+    <root id="archive" name="svyat_snake.jar">
+      <element id="module-output" name="svyat_snake" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/sqlite-jdbc-3.21.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

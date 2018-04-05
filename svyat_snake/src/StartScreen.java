@@ -53,18 +53,26 @@ public class StartScreen {
         keys.setLayoutX(470);
         keys.setLayoutY(90);
 
-        // Play
+        // Play button image
         ImageView playView = new ImageView(new Image("play.png"));
         playView.setFitHeight(150);
         playView.setPreserveRatio(true);
         playView.setLayoutX(320);
         playView.setLayoutY(170);
 
+        // Click here instructions
+        // Control instructions
+        Text clickHere = new Text("Click to play");
+        clickHere.setFont(Font.font("Calibri", FontWeight.BOLD, 20));
+        clickHere.setFill(Color.BLUE);
+        clickHere.setLayoutX(348);
+        clickHere.setLayoutY(348);
+
         // Background
         ImageView backgroundView = new ImageView(Main.BACKGROUND_IMAGE);
 
         // Add elements to the root
-        root.getChildren().setAll(backgroundView, logoView, controlsView, keys, playView);
+        root.getChildren().setAll(backgroundView, logoView, controlsView, keys, playView, clickHere);
 
         return root;
     }
